@@ -1,26 +1,26 @@
-function Write-AzurePipelinesError {
+function Write-PipelineWarning {
     <#
     .SYNOPSIS
-    Writes an error message to Azure DevOps Pipelines output.
+    Writes a warning message to Azure DevOps Pipelines output.
     
     .DESCRIPTION
-    This function writes an error message using Azure DevOps Pipelines logging commands.
-    The message will appear as an error in the pipeline logs and may cause the task to fail.
+    This function writes a warning message using Azure DevOps Pipelines logging commands.
+    The message will appear as a warning in the pipeline logs.
     
     .PARAMETER Message
-    The error message to display.
+    The warning message to display.
     
     .PARAMETER SourcePath
-    Optional source file path where the error occurred.
+    Optional source file path where the warning occurred.
     
     .PARAMETER LineNumber
-    Optional line number where the error occurred.
+    Optional line number where the warning occurred.
     
     .EXAMPLE
-    Write-AzurePipelinesError -Message "File not found"
+    Write-PipelineWarning -Message "This is a warning"
     
     .EXAMPLE
-    Write-AzurePipelinesError -Message "Compilation failed" -SourcePath "build.ps1" -LineNumber 25
+    Write-PipelineWarning -Message "Deprecated function used" -SourcePath "script.ps1" -LineNumber 42
     #>
     [CmdletBinding()]
     param(
@@ -44,5 +44,5 @@ function Write-AzurePipelinesError {
     
     $propertyString = if ($properties.Count -gt 0) { ";$($properties -join ';')" } else { "" }
     
-    Write-Output "##vso[task.logissue type=error$propertyString]$Message"
+    Write-Output "##vso[task.logissue type=warning$propertyString]$Message"
 }

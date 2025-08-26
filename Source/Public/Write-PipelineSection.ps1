@@ -1,4 +1,4 @@
-function Write-AzurePipelinesSection {
+function Write-PipelineSection {
     <#
     .SYNOPSIS
     Starts or ends a collapsible section in Azure DevOps Pipeline logs.
@@ -17,9 +17,9 @@ function Write-AzurePipelinesSection {
     Indicates this is the end of a section.
     
     .EXAMPLE
-    Write-AzurePipelinesSection -Name "Build" -Start
+    Write-PipelineSection -Name "Build" -Start
     # ... build commands ...
-    Write-AzurePipelinesSection -Name "Build" -End
+    Write-PipelineSection -Name "Build" -End
     #>
     [CmdletBinding(DefaultParameterSetName = 'Start')]
     param(

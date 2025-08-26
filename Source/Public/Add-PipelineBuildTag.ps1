@@ -1,4 +1,4 @@
-function Add-AzurePipelinesBuildTag {
+function Add-PipelineBuildTag {
     <#
     .SYNOPSIS
     Adds a tag to the current Azure DevOps Pipeline build.
@@ -11,10 +11,10 @@ function Add-AzurePipelinesBuildTag {
     The tag to add to the build.
     
     .EXAMPLE
-    Add-AzurePipelinesBuildTag -Tag "release"
+    Add-PipelineBuildTag -Tag "release"
     
     .EXAMPLE
-    Add-AzurePipelinesBuildTag -Tag "hotfix"
+    Add-PipelineBuildTag -Tag "hotfix"
     #>
     [CmdletBinding()]
     param(

@@ -1,4 +1,4 @@
-function Write-AzurePipelinesTaskProgress {
+function Write-PipelineTaskProgress {
     <#
     .SYNOPSIS
     Updates the progress of the current Azure DevOps Pipeline task.
@@ -13,10 +13,10 @@ function Write-AzurePipelinesTaskProgress {
     The percentage of completion (0-100).
     
     .EXAMPLE
-    Write-AzurePipelinesTaskProgress -CurrentOperation "Installing dependencies" -PercentComplete 25
+    Write-PipelineTaskProgress -CurrentOperation "Installing dependencies" -PercentComplete 25
     
     .EXAMPLE
-    Write-AzurePipelinesTaskProgress -CurrentOperation "Running tests" -PercentComplete 75
+    Write-PipelineTaskProgress -CurrentOperation "Running tests" -PercentComplete 75
     #>
     [CmdletBinding()]
     param(
