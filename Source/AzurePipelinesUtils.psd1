@@ -13,7 +13,7 @@
     TypesToProcess = @()
     FormatsToProcess = @()
     NestedModules = @()
-    FunctionsToExport = '*'
+    FunctionsToExport = @()
     CmdletsToExport = '*'
     VariablesToExport = '*'
     AliasesToExport = '*'
@@ -26,6 +26,7 @@
             LicenseUri = 'https://github.com/igoravl/AzurePipelinesUtils/blob/main/LICENSE'
             ProjectUri = 'https://github.com/igoravl/AzurePipelinesUtils'
             IconUri = ''
+            Prerelease = ''
             ReleaseNotes = 'Initial release of AzurePipelinesUtils PowerShell module'
             RequireLicenseAcceptance = $false
             ExternalModuleDependencies = @()
