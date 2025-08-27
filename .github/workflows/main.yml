@@ -64,7 +64,7 @@ jobs:
         id: extract_release_notes
         shell: pwsh
         run: |
-          $fileName = (Get-ChildItem 'Docs/ReleaseNotes/*.md' | Sort-Object Name -Descending | Select -ExpandProperty FullName -First 1)
+          $fileName = (Get-ChildItem 'docs/ReleaseNotes/*.md' | Sort-Object Name -Descending | Select -ExpandProperty FullName -First 1)
           Write-Output $fileName
           $releaseNotes = (Get-Content $fileName -Encoding UTF8 | Select-Object -Skip 4)
           Write-Output $releaseNotes
