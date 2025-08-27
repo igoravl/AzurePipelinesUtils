@@ -1,5 +1,5 @@
 @{
     Path = "AzurePipelinesUtils.psd1"
-    OutputDirectory = "out/module"
+    OutputDirectory = "../out/module"
     UnversionedOutputDirectory = $true
 }

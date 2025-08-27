@@ -15,8 +15,7 @@ task . Build
 # Synopsis: Clean build artifacts
 task Clean {
     Write-Host 'Cleaning build artifacts...'
-    Remove-Item -Path (Join-Path $PSScriptRoot 'Build') -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path (Join-Path $PSScriptRoot 'artifacts') -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path (Join-Path $PSScriptRoot 'out') -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 # Synopsis: Build the module using ModuleBuilder
@@ -77,11 +76,11 @@ task Test Build, {
     $config = New-PesterConfiguration
     $config.Run.Path = Join-Path $PSScriptRoot 'Tests'
     $config.TestResult.Enabled = $true
-    $config.TestResult.OutputPath = Join-Path $PSScriptRoot 'Build\TestResults.xml'
+    $config.TestResult.OutputPath = Join-Path $PSScriptRoot 'out\TestResults.xml'
     $config.TestResult.OutputFormat = 'NUnitXml'
     $config.CodeCoverage.Enabled = $true
-    $config.CodeCoverage.Path = (Get-ChildItem -Path (Join-Path $PSScriptRoot 'Build') -Include '*.psm1' -Recurse).FullName
-    $config.CodeCoverage.OutputPath = Join-Path $PSScriptRoot 'Build\CodeCoverage.xml'
+    $config.CodeCoverage.Path = (Get-ChildItem -Path (Join-Path $PSScriptRoot 'out/module') -Include '*.psm1' -Recurse).FullName
+    $config.CodeCoverage.OutputPath = Join-Path $PSScriptRoot 'out/CodeCoverage.xml'
     $config.Output.Verbosity = 'Detailed'
     
     $testResult = Invoke-Pester -Configuration $config
@@ -96,12 +95,12 @@ task Test Build, {
 }
 
 # Synopsis: Create distribution package
-task Pack Build, {
+task Package Build, {
     Write-Host 'Packing module into zip...'
-    $out = Join-Path $PSScriptRoot 'artifacts'
+    $out = Join-Path $PSScriptRoot 'out/portable'
     if (-not (Test-Path $out)) { New-Item -ItemType Directory -Path $out | Out-Null }
     
-    $buildPath = Join-Path $PSScriptRoot 'Build'
+    $buildPath = Join-Path $PSScriptRoot 'out/module'
     $zip = Join-Path $out "AzurePipelinesUtils-$BuildNumber.zip"
     
     if (Test-Path $zip) { Remove-Item $zip }
@@ -122,7 +121,7 @@ task Publish Build, {
     }
     
     # Get the module path
-    $modulePath = Join-Path $PSScriptRoot 'Build\AzurePipelinesUtils'
+    $modulePath = Join-Path $PSScriptRoot 'out/module/AzurePipelinesUtils'
     
     # Publish the module
     Write-Host "Publishing module version $BuildNumber to PowerShell Gallery..."

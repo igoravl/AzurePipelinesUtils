@@ -18,7 +18,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      PS_GALLERY_TOKEN: ${{ secrets.PS_GALLERY_TOKEN }}
+      PS_GALLERY_TOKEN: ${{ secrets.PSGALLERY_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
