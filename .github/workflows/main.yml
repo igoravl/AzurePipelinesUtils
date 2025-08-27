@@ -152,7 +152,7 @@ jobs:
           Install-Module PackageManagement -Scope CurrentUser -Force
           Install-Module PowerShellGet -Scope CurrentUser -Force
           New-Item -ItemType Directory -Path 'Module/${{ env.ModuleName }}' -Force
-          Expand-Archive -Path (Get-ChildItem 'AzurePipelinesUtils*.zip') -DestinationPath 'Module/${{ env.ModuleName }}'
+          Expand-Archive -Path (Get-ChildItem 'AzurePipelinesUtils*.zip') -DestinationPath Module
           $releaseNotes = $env:RELEASE_NOTES
           Write-Host "Release Notes: $releaseNotes"
           Write-Host "Publishing module..."
