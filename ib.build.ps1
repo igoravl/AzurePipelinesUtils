@@ -55,7 +55,11 @@ task GetBuildNumber {
     $gitVersionInfo = $gitVersionOutput | ConvertFrom-Json
 
     # Set the build number
-    $script:BuildNumber = $gitVersionInfo.MajorMinorPatch + "-pre$($gitVersionInfo.WeightedPreReleaseNumber)"
+    if($gitVersionInfo.PreReleaseLabel) {
+        $preReleasePart = "-pre$($gitVersionInfo.WeightedPreReleaseNumber)"
+    }
+    
+    $script:BuildNumber = $gitVersionInfo.MajorMinorPatch + $preReleasePart
 
     Write-Host "Build number set to: $BuildNumber"
 
