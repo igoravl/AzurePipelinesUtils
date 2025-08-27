@@ -61,10 +61,10 @@ task GetBuildNumber {
 
     # If running in GitHub Actions, set the output parameter
     if ($env:GITHUB_ACTIONS -eq 'true') {
-        Write-Host "::set-output name=build_number::$BuildNumber"
+        Write-Host "::set-output name=BUILD_NAME::$BuildNumber"
         # For newer GitHub Actions
-        "build_number=$BuildNumber" >> $env:GITHUB_OUTPUT
-        Write-Host "GitHub Actions build number set as output variable"
+        "BUILD_NAME=$BuildNumber" >> $env:GITHUB_OUTPUT
+        Write-Host "GitHub Actions build name set as output variable"
     }
 }
 

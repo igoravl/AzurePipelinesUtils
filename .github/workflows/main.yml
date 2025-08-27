@@ -41,6 +41,11 @@ jobs:
         with:
           name: portable
           path: "out/portable/*.zip"
+      - name: Publish Docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: "Docs/*"
     outputs:
       BUILD_NAME: ${{ steps.build_module.outputs.BUILD_NAME }}
 
@@ -152,92 +157,4 @@ jobs:
           $releaseNotes = $env:RELEASE_NOTES
           Publish-Module -Name Module/${{ env.ModuleName }} -NuGetApiKey $env:PSGALLERY_KEY -AllowPreRelease -ReleaseNotes $releaseNotes
 
-  Nuget:
 
-    runs-on: ubuntu-latest
-    needs: [ Release ]
-    environment: nuget
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: nuget
-      - name: Push package
-        run: |
-          dotnet nuget push $(ls ${{ env.ModuleName }}*.nupkg) -s https://api.nuget.org/v3/index.json -k ${{ secrets.API_KEY }} --skip-duplicate
-
-  Chocolatey:
-
-    runs-on: windows-latest
-    needs: [ Release ]
-    environment: chocolatey
-    env:
-      CHOCO_KEY: ${{ secrets.API_KEY }}
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: chocolatey
-      - name: Install Chocolatey
-        shell: pwsh
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-          iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-      - name: Push package
-        run: |
-          choco push $(ls ${{ env.ModuleName }}*.nupkg) --api-key $env:CHOCO_KEY --source='https://push.chocolatey.org/'
-  
-  WinGet:
-
-    runs-on: ubuntu-latest
-    needs: [ Release ]
-    environment: winget
-    env:
-      GITHUB_TOKEN: ${{ secrets.API_GITHUB_TOKEN }}
-      BUILD_NAME: ${{ needs.Release.outputs.BUILD_NAME }}
-    steps:
-      - name: Clone winget-pkgs repository
-        shell: bash
-        run: |
-          git clone --single-branch --branch "master" "https://igoravl:$GITHUB_TOKEN@github.com/igoravl/winget-pkgs.git"
-          cd winget-pkgs
-          git remote add upstream https://github.com/microsoft/winget-pkgs.git
-          git fetch upstream
-          git checkout -b "${{ env.ModuleName }}_$BUILD_NAME"
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: winget
-          path: winget-pkgs
-      - name: Push to wingets-pkgs repository
-        shell: bash
-        run: |
-          cd winget-pkgs
-          git config --local user.email "igoravl@gmail.com"
-          git config --local user.name "Igor Abade"
-          git add manifests/i/Igoravl/${{ env.ModuleName }}/*
-          git commit -m "Release $BUILD_NAME"
-          git push -u origin "${{ env.ModuleName }}_$BUILD_NAME"
-      - name: Create pull request to microsoft/winget-pkgs
-        shell: pwsh
-        run: |
-          # Install module
-          Install-Module PowerShellForGitHub -Scope CurrentUser -Force
-          # Connect to GitHub
-          Set-GitHubConfiguration -SuppressTelemetryReminder -DefaultOwnerName igoravl -DefaultRepository winget-pkgs
-          Set-GitHubAuthentication -SessionOnly -Credential (New-Object System.Management.Automation.PSCredential @("pat",
-            (ConvertTo-SecureString -String $env:GITHUB_TOKEN -AsPlainText -Force)))
-          # Create pull request
-          New-GitHubPullRequest -OwnerName Microsoft -RepositoryName winget-pkgs `
-            -Title "${{ env.ModuleName }}_$env:BUILD_NAME" -Head "igoravl:${{ env.ModuleName }}_$env:BUILD_NAME" -base master -Body @'
-          - [x] Have you signed the [Contributor License Agreement](https://cla.opensource.microsoft.com/microsoft/winget-pkgs)?
-          - [x] Have you checked that there aren't other open [pull requests](https://github.com/microsoft/winget-pkgs/pulls) for the same manifest update/change?
-          - [x] Have you validated your manifest locally with `winget validate --manifest <path>`? 
-          - [x] Have you tested your manifest locally with `winget install --manifest <path>`?
-          - [x] Does your manifest conform to the [1.0 schema](https://github.com/microsoft/winget-cli/blob/master/doc/ManifestSpecv1.0.md)?
-
-          Note: `<path>` is the name of the directory containing the manifest you're submitting.
-
-          -----
-          '@
