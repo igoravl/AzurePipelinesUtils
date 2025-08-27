@@ -18,8 +18,6 @@ jobs:
   Build:
 
     runs-on: ubuntu-latest
-    env:
-      PS_GALLERY_TOKEN: ${{ secrets.PSGALLERY_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,12 +28,6 @@ jobs:
         shell: pwsh
         run: |
           ./Build.ps1 -Targets Package -Verbose:$${{ env.Debug }} -InstallDependencies
-      # - name: Publish Test Results
-      #   uses: EnricoMi/publish-unit-test-result-action/windows@v2
-      #   if: always()
-      #   with:
-      #     files: |
-      #       out\TestResults-Pester*.xml
       - name: Publish Portable
         uses: actions/upload-artifact@v4
         with:
@@ -54,6 +46,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     needs: [ Build ]
+    permissions:
+      contents: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       BUILD_NAME: ${{ needs.Build.outputs.BUILD_NAME }}
