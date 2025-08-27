@@ -1,5 +1,10 @@
 #requires -module InvokeBuild, ModuleBuilder
 
+#
+# WARNING: This file should not be executed directly.
+# Use the Build.ps1 script in the project root to execute the build.
+#
+
 param(
     [string] $BuildNumber 
 )
@@ -21,12 +26,16 @@ task Build Clean, GetBuildNumber, {
     # Use ModuleBuilder to transpile individual .ps1 files into a single .psm1
     $buildParams = @{
         SourcePath = Join-Path $PSScriptRoot 'Source'
-        OutputDirectory = Join-Path $PSScriptRoot 'Build'
-        UnversionedOutputDirectory = $true
+    }
+    
+    # Add SemVer parameter if BuildNumber is provided
+    if ($BuildNumber) {
+        Write-Host "Setting module version to $BuildNumber..."
+        $buildParams.SemVer = $BuildNumber
     }
     
     Build-Module @buildParams
-    Write-Host "Module built successfully using ModuleBuilder"
+    Write-Host "Module built successfully using ModuleBuilder with version $BuildNumber"
 }
 
 # Synopsis: Get the build number
@@ -47,7 +56,7 @@ task GetBuildNumber {
     $gitVersionInfo = $gitVersionOutput | ConvertFrom-Json
 
     # Set the build number
-    $script:BuildNumber = $gitVersionInfo.SemVer
+    $script:BuildNumber = $gitVersionInfo.FullSemVer
 
     Write-Host "Build number set to: $BuildNumber"
 
@@ -100,4 +109,24 @@ task Pack Build, {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [System.IO.Compression.ZipFile]::CreateFromDirectory($buildPath, $zip)
     Write-Host "Created $zip"
+}
+
+# Synopsis: Publish module to PowerShell Gallery
+task Publish Build, {
+    Write-Host 'Publishing module to PowerShell Gallery...'
+    
+    # Check for API key in environment variable
+    $apiKey = $env:PSGALLERY_API_KEY
+    if (-not $apiKey) {
+        throw "PowerShell Gallery API Key not found. Set the PSGALLERY_API_KEY environment variable."
+    }
+    
+    # Get the module path
+    $modulePath = Join-Path $PSScriptRoot 'Build\AzurePipelinesUtils'
+    
+    # Publish the module
+    Write-Host "Publishing module version $BuildNumber to PowerShell Gallery..."
+    Publish-Module -Path $modulePath -NuGetApiKey $apiKey -Verbose
+    
+    Write-Host "Module published successfully to PowerShell Gallery" -ForegroundColor Green
 }
