@@ -104,6 +104,8 @@ jobs:
     environment: production
     needs: [ Staging ]
     # if: ${{ github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       BUILD_NAME: ${{ needs.Staging.outputs.BUILD_NAME }}
