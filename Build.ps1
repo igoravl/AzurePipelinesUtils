@@ -1,5 +1,5 @@
 #
-# AzurePipelinesUtils Build Script
+# Module Build Script
 #
 # This script checks for required build dependencies
 # and invokes Invoke-Build with the appropriate parameters.
