@@ -150,7 +150,8 @@ jobs:
         run: |
           Install-Module PackageManagement -Scope CurrentUser -Force
           Install-Module PowerShellGet -Scope CurrentUser -Force
-          Expand-Archive AzureArtifacts*.zip -DestinationPath Module/${{ env.ModuleName }}
+          New-Item -ItemType Directory -Path 'Module/${{ env.ModuleName }}' -Force
+          Expand-Archive 'portable/AzureArtifacts*.zip' -DestinationPath 'Module/${{ env.ModuleName }}'
           $releaseNotes = $env:RELEASE_NOTES
           Publish-Module -Name Module/${{ env.ModuleName }} -NuGetApiKey $env:PSGALLERY_KEY -AllowPreRelease -ReleaseNotes $releaseNotes
 
