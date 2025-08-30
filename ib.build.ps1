@@ -6,7 +6,8 @@
 #
 
 param(
-    [string] $BuildNumber 
+    [string] $BuildNumber,
+    [string] $ModuleName = 'AzurePipelinesUtils'
 )
 
 # Synopsis: Default build target - runs Build task
@@ -20,7 +21,7 @@ task Clean {
 
 # Synopsis: Build the module using ModuleBuilder
 task Build Clean, GetBuildNumber, {
-    Write-Host "Building AzurePipelinesUtils module with ModuleBuilder..."
+    Write-Host "Building module with ModuleBuilder..."
     
     # Use ModuleBuilder to transpile individual .ps1 files into a single .psm1
     $buildParams = @{
@@ -65,8 +66,6 @@ task GetBuildNumber {
 
     # If running in GitHub Actions, set the output parameter
     if ($env:GITHUB_ACTIONS -eq 'true') {
-        Write-Host "::set-output name=BUILD_NAME::$BuildNumber"
-        # For newer GitHub Actions
         "BUILD_NAME=$BuildNumber" >> $env:GITHUB_OUTPUT
         Write-Host "GitHub Actions build name set as output variable"
     }
@@ -105,8 +104,8 @@ task Package Build, {
     if (-not (Test-Path $out)) { New-Item -ItemType Directory -Path $out | Out-Null }
     
     $buildPath = Join-Path $PSScriptRoot 'out/module'
-    $zip = Join-Path $out "AzurePipelinesUtils-$BuildNumber.zip"
-    
+    $zip = Join-Path $out "$ModuleName-$BuildNumber.zip"
+
     if (Test-Path $zip) { Remove-Item $zip }
     
     Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -125,8 +124,8 @@ task Publish Build, {
     }
     
     # Get the module path
-    $modulePath = Join-Path $PSScriptRoot 'out/module/AzurePipelinesUtils'
-    
+    $modulePath = Join-Path $PSScriptRoot "out/module/$ModuleName"
+
     # Publish the module
     Write-Host "Publishing module version $BuildNumber to PowerShell Gallery..."
     Publish-Module -Path $modulePath -NuGetApiKey $apiKey -Verbose

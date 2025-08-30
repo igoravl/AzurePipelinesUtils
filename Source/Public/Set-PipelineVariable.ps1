@@ -40,7 +40,10 @@ function Set-PipelineVariable {
         [switch]$Secret,
         
         [Parameter(Mandatory = $false)]
-        [switch]$Output
+        [switch]$Output,
+        
+        [Parameter(Mandatory = $false)]
+        [switch]$ReadOnly
     )
     
     $properties = ''
@@ -50,6 +53,9 @@ function Set-PipelineVariable {
     }
     if ($Output) {
         $properties += ";isoutput=true"
+    }
+    if ($ReadOnly) {
+        $properties += ";isreadonly=true"
     }
 
     Write-Output "##vso[task.setvariable variable=$Name$properties]$Value"

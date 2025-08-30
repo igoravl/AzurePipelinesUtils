@@ -27,22 +27,42 @@ function Write-PipelineWarning {
         [Parameter(Mandatory = $true, Position = 0)]
         [string]$Message,
         
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         [string]$SourcePath,
         
-        [Parameter(Mandatory = $false)]
-        [int]$LineNumber
+        [Parameter()]
+        [int]$LineNumber,
+
+        [Parameter()]
+        [int]$ColumnNumber,
+
+        [Parameter()]
+        [Alias('Code')]
+        [string]$IssueCode,
+
+        [Parameter()]
+        [switch] $DoNotUpdateJobStatus
     )
     
-    $properties = @()
-    if ($SourcePath) {
-        $properties += "sourcepath=$SourcePath"
-    }
-    if ($LineNumber) {
-        $properties += "linenumber=$LineNumber"
+    if ((Test-PipelineContext)) {
+        $prefix = '##[warning] ' 
     }
     
-    $propertyString = if ($properties.Count -gt 0) { ";$($properties -join ';')" } else { "" }
+    if ($DoNotUpdateJobStatus.IsPresent) {
+        Write-Host "${prefix}$Message" -ForegroundColor Yellow
+        return
+    }
     
-    Write-Output "##vso[task.logissue type=warning$propertyString]$Message"
+    $properties = ''
+
+    if ($SourcePath) { $properties += ";sourcepath=$SourcePath" }
+    if ($LineNumber) { $properties += ";linenumber=$LineNumber" }
+    if ($ColumnNumber) { $properties += ";columnnumber=$ColumnNumber" }
+    if ($IssueCode) { $properties += ";code=$IssueCode" }
+
+    $global:_task_status = 'SucceededWithIssues'
+    Write-Host "##vso[task.logissue type=warning$properties]$Message"
 }
+
+# Alias
+Set-Alias -Name 'Write-Warning' -Value 'Write-PipelineWarning' -Force -Scope Global
