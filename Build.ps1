@@ -55,7 +55,7 @@ if (-not (Get-Module -ListAvailable -Name ModuleBuilder)) {
 }
 
 # Verifies GitVersion.Tool installation
-$gitVersionInstalled = $null -ne (dotnet tool list --global | Where-Object { $_ -match 'gitversion.tool' })
+$gitVersionInstalled = $null -ne (Get-Command 'dotnet-gitversion' -ErrorAction SilentlyContinue)
 if (-not $gitVersionInstalled) {
     Write-Warning "GitVersion.Tool not found."
     
