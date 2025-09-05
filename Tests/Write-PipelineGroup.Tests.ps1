@@ -11,8 +11,8 @@ Describe 'Write-PipelineGroupStart/End' {
 
             $content = Get-Content -Path $temp -Raw
 
-            $content | Should Match '##\[group\]\[\d{2}:\d{2}:\d{2}\.\d{3}\] Build Phase'
-            $content | Should Match '##\[endgroup\]'
+            $content | Should -Match '##\[group\]\[\d{2}:\d{2}:\d{2}\.\d{3}\] Build Phase'
+            $content | Should -Match '##\[endgroup\]'
         }
         finally {
             if (Test-Path $temp) { Remove-Item $temp -Force }

@@ -6,7 +6,7 @@ Describe 'Write-PipelineProgress' {
         AfterAll { $env:TF_BUILD=$script:saved }
         It 'produces no output (Write-Progress only)' {
             $result = & { Write-PipelineProgress -PercentComplete 25 -Activity 'Deploy' } 6>&1 | Out-String
-            ($result.Trim()).Length | Should Be 0
+            ($result.Trim()).Length | Should -Be 0
         }
     }
     Context 'inside pipeline context' {
@@ -14,7 +14,7 @@ Describe 'Write-PipelineProgress' {
         AfterAll { $env:TF_BUILD=$script:saved }
         It 'writes vso task progress command' {
             $result = & { Write-PipelineProgress -PercentComplete 25 -Activity 'Deploy' } 6>&1 | Out-String
-            $result.Trim() | Should Be '##vso[task.setprogress value=25;]Deploy - 25%'
+            $result.Trim() | Should -Be '##vso[task.setprogress value=25;]Deploy - 25%'
         }
     }
 }

@@ -6,12 +6,12 @@ InModuleScope -ModuleName 'AzurePipelinesUtils' {
             $savedTfBuild = $env:TF_BUILD; $savedAgentId = $env:AGENT_ID; $savedBuildId = $env:BUILD_BUILDID
             try {
                 $env:TF_BUILD = $null; $env:AGENT_ID = $null; $env:BUILD_BUILDID = $null
-                (_TestPipelineContext) | Should Be $false
+                (_TestPipelineContext) | Should -Be $false
             } finally { $env:TF_BUILD = $savedTfBuild; $env:AGENT_ID = $savedAgentId; $env:BUILD_BUILDID = $savedBuildId }
         }
         It 'returns true when TF_BUILD is set' {
             $savedTfBuild = $env:TF_BUILD
-            try { $env:TF_BUILD = 'true'; (_TestPipelineContext) | Should Be $true } finally { $env:TF_BUILD = $savedTfBuild }
+            try { $env:TF_BUILD = 'true'; (_TestPipelineContext) | Should -Be $true } finally { $env:TF_BUILD = $savedTfBuild }
         }
     }
 }

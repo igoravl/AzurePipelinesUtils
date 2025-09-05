@@ -3,6 +3,6 @@
 Describe 'Complete-PipelineTask' {
     It 'does nothing outside pipeline context for default status' {
         $out = Complete-PipelineTask
-        $out | Should Be $null
+    $out | Should -Be $null
     }
 }

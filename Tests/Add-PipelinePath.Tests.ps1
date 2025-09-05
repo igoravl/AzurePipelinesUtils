@@ -6,6 +6,6 @@ Describe 'Add-PipelinePath' {
         $file = Join-Path $temp.FullName 'dummy.txt'
         Set-Content -Path $file -Value 'x'
         Add-PipelinePath -Path $temp.FullName
-        $env:PATH.Split([IO.Path]::PathSeparator)[0] | Should Be $temp.FullName
+    $env:PATH.Split([IO.Path]::PathSeparator)[0] | Should -Be $temp.FullName
     }
 }

@@ -4,7 +4,7 @@ Describe 'Write-PipelineDebug' {
     Context 'outside pipeline context' {
         It 'writes plain debug message' {
             $result = & { Write-PipelineDebug -Message 'Debug details' } 6>&1 | Out-String
-            $result.Trim() | Should Be 'Debug details'
+            $result.Trim() | Should -Be 'Debug details'
         }
     }
     Context 'inside pipeline context' {
@@ -12,7 +12,7 @@ Describe 'Write-PipelineDebug' {
         AfterAll { $env:TF_BUILD=$script:saved }
         It 'writes same debug message' {
             $result = & { Write-PipelineDebug -Message 'Debug details' } 6>&1 | Out-String
-            $result.Trim() | Should Be 'Debug details'
+            $result.Trim() | Should -Be 'Debug details'
         }
     }
 }

@@ -3,6 +3,6 @@
 Describe 'Add-PipelineBuildTag' {
     It 'adds a build tag with the correct format' {
         $output = Add-PipelineBuildTag -Tag 'release'
-        $output | Should Be '##vso[build.addbuildtag]release'
+    $output | Should -Be '##vso[build.addbuildtag]release'
     }
 }
