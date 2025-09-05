@@ -16,5 +16,5 @@ Function Write-PipelineCommand {
         [string]$Message
     )
     
-    Write-PipelineLog -Message $Message -LogType Command
+    _WriteLog -Message $Message -LogType Command
 }

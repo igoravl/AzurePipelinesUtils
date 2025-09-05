@@ -25,7 +25,7 @@ function Set-PipelineBuildNumber {
         [string]$BuildNumber
     )
 
-    if ((Test-PipelineContext)) {
+    if ((_TestPipelineContext)) {
         $prefix = '##vso[build.updatebuildnumber]'
     }
     else {

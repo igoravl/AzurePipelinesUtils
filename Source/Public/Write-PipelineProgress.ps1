@@ -41,7 +41,7 @@ function Write-PipelineProgress {
         [string]$Activity
     )
 
-    if ((Test-PipelineContext)) {
+    if ((_TestPipelineContext)) {
         # Using Azure DevOps Pipelines task progress command
         Write-Output "##vso[task.setprogress value=$PercentComplete;]$Activity - $PercentComplete%"
     }

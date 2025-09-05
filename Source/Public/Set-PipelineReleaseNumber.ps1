@@ -22,7 +22,7 @@ function Set-PipelineReleaseNumber {
         [string]$ReleaseNumber
     )
 
-    if ((Test-PipelineContext)) {
+    if ((_TestPipelineContext)) {
         $prefix = '##vso[release.updatereleasename]'
     }
     else {

@@ -32,7 +32,7 @@ Function Write-PipelineSection {
     $msg = "== $Text =="
     $box = "`n"
 
-    if ((Test-PipelineContext)) {
+    if ((_TestPipelineContext)) {
         $prefix = '##[section]'
     }
 

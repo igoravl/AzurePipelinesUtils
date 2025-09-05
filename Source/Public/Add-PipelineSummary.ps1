@@ -48,7 +48,7 @@ function Add-PipelineSummary {
             Set-Content -Path $Path -Value $Content -Encoding UTF8
         }
 
-        if ((Test-PipelineContext)) {
+        if ((_TestPipelineContext)) {
             Write-Host "##vso[task.uploadsummary]$Path"
         }
         else {
