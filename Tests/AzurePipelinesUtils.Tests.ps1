@@ -61,7 +61,7 @@ Describe 'Add-PipelineBuildTag' {
 }
 
 InModuleScope -ModuleName 'AzurePipelinesUtils' {
-    Describe 'Test-PipelineContext' {
+    Describe '_TestPipelineContext' {
         It 'returns false when not in Azure Pipelines context' {
             # Save current environment variables
             $savedTfBuild = $env:TF_BUILD
@@ -74,7 +74,7 @@ InModuleScope -ModuleName 'AzurePipelinesUtils' {
                 $env:AGENT_ID = $null
                 $env:BUILD_BUILDID = $null
                 
-                $result = Test-PipelineContext
+                $result = _TestPipelineContext
                 $result | Should -Be $false
             }
             finally {
