@@ -53,7 +53,8 @@ task GetBuildNumber {
 
     # Use GitVersion to get the SemVer
     Write-Host "Running GitVersion..."
-    $gitVersionOutput = dotnet-gitversion
+    $configFile = Join-Path $PSScriptRoot 'gitversion.yml'
+    $gitVersionOutput = dotnet-gitversion /config $configFile
     $gitVersionInfo = $gitVersionOutput | ConvertFrom-Json
 
     # Set the build number
