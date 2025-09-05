@@ -26,8 +26,9 @@ task Build Clean, GetBuildNumber, {
     # Use ModuleBuilder to transpile individual .ps1 files into a single .psm1
     $buildParams = @{
         SourcePath = Join-Path $PSScriptRoot 'Source'
+        CopyPaths = @(Join-Path $PSScriptRoot 'Source/init.ps1')
     }
-    
+
     # Add SemVer parameter if BuildNumber is provided
     if ($BuildNumber) {
         Write-Host "Setting module version to $BuildNumber..."
