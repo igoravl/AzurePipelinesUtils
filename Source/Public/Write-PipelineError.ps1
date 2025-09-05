@@ -11,11 +11,11 @@ function Write-PipelineError {
         [int]$LineNumber
     )
     
-    if ((Test-PipelineContext)) {
+    if ((_TestPipelineContext)) {
         $prefix = '##[warning] ' 
     }
     
-    if ($DoNotUpdateJobStatus.IsPresent) {
+    if ($UpdateTaskStatus.IsPresent) {
         Write-Host "${prefix}$Message" -ForegroundColor Yellow
         return
     }
@@ -29,4 +29,6 @@ function Write-PipelineError {
 }
 
 # Alias
-Set-Alias -Name 'Write-Error' -Value 'Write-PipelineError' -Force -Scope Global
+if (_TestPipelineContext) {
+    Set-Alias -Name 'Write-Error' -Value 'Write-PipelineError' -Force -Scope Global
+}

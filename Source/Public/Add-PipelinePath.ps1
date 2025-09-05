@@ -33,7 +33,7 @@ function Add-PipelinePath {
         Write-Error "The specified path '$Path' does not exist or is not a directory."
     }
 
-    if ((Test-PipelineContext)) {
+    if ((_TestPipelineContext)) {
         Write-Host "##vso[task.prependpath]$Path"
     }
     else {

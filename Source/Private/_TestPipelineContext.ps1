@@ -1,5 +1,5 @@
 # Private helper function to validate Azure Pipelines context
-function Test-PipelineContext {
+function _TestPipelineContext {
     <#
     .SYNOPSIS
     Tests if the current session is running in an Azure DevOps Pipeline.

@@ -1,4 +1,4 @@
-#requires -module InvokeBuild, ModuleBuilder
+#requires -module InvokeBuild, ModuleBuilder, Pester
 
 #
 # WARNING: This file should not be executed directly.
@@ -26,8 +26,9 @@ task Build Clean, GetBuildNumber, {
     # Use ModuleBuilder to transpile individual .ps1 files into a single .psm1
     $buildParams = @{
         SourcePath = Join-Path $PSScriptRoot 'Source'
+        CopyPaths = @(Join-Path $PSScriptRoot 'Source/init.ps1')
     }
-    
+
     # Add SemVer parameter if BuildNumber is provided
     if ($BuildNumber) {
         Write-Host "Setting module version to $BuildNumber..."
@@ -52,14 +53,29 @@ task GetBuildNumber {
 
     # Use GitVersion to get the SemVer
     Write-Host "Running GitVersion..."
-    $gitVersionOutput = dotnet-gitversion
+    # Handle case-sensitive file systems (Linux) where file name casing matters
+    $gitVersionConfig = Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'GitVersion.yml' -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $gitVersionConfig) {
+        # Fallback to lowercase variant if repository chooses it
+        $lowerCasePath = Join-Path $PSScriptRoot 'gitversion.yml'
+        if (Test-Path $lowerCasePath) { $gitVersionConfig = Get-Item $lowerCasePath }
+    }
+
+    if ($gitVersionConfig) {
+        $gitVersionOutput = dotnet-gitversion /config $gitVersionConfig.FullName
+    }
+    else {
+        Write-Warning "GitVersion configuration file not found. Falling back to default GitVersion configuration."
+        $gitVersionOutput = dotnet-gitversion
+    }
+
     $gitVersionInfo = $gitVersionOutput | ConvertFrom-Json
 
     # Set the build number
-    if($gitVersionInfo.PreReleaseLabel) {
+    if ($gitVersionInfo.PreReleaseLabel) {
         $preReleasePart = "-pre$($gitVersionInfo.WeightedPreReleaseNumber)"
     }
-    
+
     $script:BuildNumber = $gitVersionInfo.MajorMinorPatch + $preReleasePart
 
     Write-Host "Build number set to: $BuildNumber"
@@ -74,26 +90,35 @@ task GetBuildNumber {
 # Synopsis: Run Pester tests
 task Test Build, {
     Write-Host 'Running Pester tests...'
-    
-    # Create Pester configuration for Pester 5
+
+    # Garantir Pester 5 carregado (Build.ps1 já assegura instalação >=5)
+    try {
+        Import-Module Pester -MinimumVersion 5.0.0 -Force -ErrorAction Stop
+        Write-Verbose ("Usando Pester versão {0}" -f (Get-Module Pester).Version)
+    }
+    catch { throw "Falha ao importar Pester >=5: $_" }
+
+    $resultsPath = Join-Path $PSScriptRoot 'out/test-results.xml'
+    $outDir = Split-Path $resultsPath -Parent
+    if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Path $outDir | Out-Null }
+
+    # Build a Pester 5 configuration object keeping existing folder structure
     $config = New-PesterConfiguration
     $config.Run.Path = Join-Path $PSScriptRoot 'Tests'
-    $config.TestResult.Enabled = $true
-    $config.TestResult.OutputPath = Join-Path $PSScriptRoot 'out\TestResults.xml'
-    $config.TestResult.OutputFormat = 'NUnitXml'
+    $config.Run.Exit = $true
+    $config.Output.Verbosity = 'Normal'
     $config.CodeCoverage.Enabled = $true
-    $config.CodeCoverage.Path = (Get-ChildItem -Path (Join-Path $PSScriptRoot 'out/module') -Include '*.psm1' -Recurse).FullName
-    $config.CodeCoverage.OutputPath = Join-Path $PSScriptRoot 'out/CodeCoverage.xml'
-    $config.Output.Verbosity = 'Detailed'
-    
-    $testResult = Invoke-Pester -Configuration $config
-    
-    if ($testResult.FailedCount -gt 0) {
-        Write-Host "Tests failed: $($testResult.FailedCount) of $($testResult.TotalCount)" -ForegroundColor Red
-        throw "Tests failed"
+    $config.CodeCoverage.Path = ,(Join-Path $PSScriptRoot 'Source')
+    $config.TestResult.Enabled = $true
+    $config.TestResult.OutputFormat = 'NUnitXml'
+    $config.TestResult.OutputPath = $resultsPath
+
+    try {
+        Invoke-Pester -Configuration $config
     }
-    else {
-        Write-Host "All tests passed: $($testResult.TotalCount)" -ForegroundColor Green
+    catch {
+        Write-Error "Pester tests failed: $_"
+        throw
     }
 }
 

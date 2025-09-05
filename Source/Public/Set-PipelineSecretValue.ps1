@@ -26,7 +26,7 @@ function Set-PipelineSecretValue {
         [string]$Value
     )
 
-    if ((Test-PipelineContext)) {
+    if ((_TestPipelineContext)) {
         Write-Output "##vso[task.setsecret]$Value"
     }
     else {
