@@ -78,25 +78,12 @@ task Test Build, {
     Write-Host 'Running Pester tests...'
     
     # Create Pester configuration for Pester 5
-    $config = New-PesterConfiguration
-    $config.Run.Path = Join-Path $PSScriptRoot 'Tests'
-    $config.TestResult.Enabled = $true
-    $config.TestResult.OutputPath = Join-Path $PSScriptRoot 'out\TestResults.xml'
-    $config.TestResult.OutputFormat = 'NUnitXml'
-    $config.CodeCoverage.Enabled = $true
-    $config.CodeCoverage.Path = (Get-ChildItem -Path (Join-Path $PSScriptRoot 'out/module') -Include '*.psm1' -Recurse).FullName
-    $config.CodeCoverage.OutputPath = Join-Path $PSScriptRoot 'out/CodeCoverage.xml'
-    $config.Output.Verbosity = 'Detailed'
-    
-    $testResult = Invoke-Pester -Configuration $config
-    
-    if ($testResult.FailedCount -gt 0) {
-        Write-Host "Tests failed: $($testResult.FailedCount) of $($testResult.TotalCount)" -ForegroundColor Red
-        throw "Tests failed"
-    }
-    else {
-        Write-Host "All tests passed: $($testResult.TotalCount)" -ForegroundColor Green
-    }
+    Invoke-Pester `
+        -PesterOption (New-PesterOption -IncludeVSCodeMarker) `
+        -CodeCoverage (Join-Path $PSScriptRoot 'Source') `
+        -OutputFile (Join-Path $PSScriptRoot 'out/test-results.xml') `
+        -OutputFormat NUnitXml `
+        -EnableExit
 }
 
 # Synopsis: Create distribution package

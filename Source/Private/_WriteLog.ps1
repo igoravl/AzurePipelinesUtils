@@ -61,22 +61,20 @@ function _WriteLog {
     )
 
     $LogType = $LogType.ToLower()
-    $cmdArgs = @{
-        Object = $Message
-        ForegroundColor = $null
-    }
+    # Build arguments for Write-Host lazily; avoid setting ForegroundColor to $null (causes cast errors)
+    $cmdArgs = @{ Object = $Message }
 
     if ((_TestPipelineContext)) {
-        $prefix = "##[$LogType] "
-    }
-    else {
-        $cmdArgs.ForegroundColor = switch($LogType) {
+        $prefix = "##[$LogType] " # currently unused but kept for potential future formatting
+    } else {
+        $color = switch($LogType) {
             "error" { 'Red' }
             "warning" { 'Yellow' }
             "info" { 'LightGray' }
             "debug" { 'DarkGray' }
             "command" { 'Cyan' }
         }
+        if ($color) { $cmdArgs.ForegroundColor = $color }
     }
 
     $isIssue = ($LogType -eq 'error' -or $LogType -eq 'warning')
